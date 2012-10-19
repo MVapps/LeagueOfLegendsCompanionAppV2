@@ -3,5 +3,8 @@
 
     <string name="hello">Hello World, MainActivity!</string>
     <string name="app_name">LeagueOfLegendsCompanionApp</string>
+    <string name="main_activity_button_champions">Champions</string>
+    <string name="main_activity_button_patch">Patch Notes</string>
+    <string name="main_activity_button_about">About</string>
 
 </resources>

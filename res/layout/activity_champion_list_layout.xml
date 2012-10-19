@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <!-- This layout is to pull the focus from the edittext -->
+    <LinearLayout
+        android:layout_width="0px"
+        android:layout_height="0px"
+        android:focusable="true"
+        android:focusableInTouchMode="true" >
+
+        <AutoCompleteTextView
+            android:id="@+id/autotext"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:nextFocusLeft="@id/autotext"
+            android:nextFocusUp="@id/autotext" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/champion_list_listview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/champion_list_search_icon"
+        android:layout_centerHorizontal="true" >
+    </ListView>
+
+    <ImageView
+        android:id="@+id/champion_list_search_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:src="@android:drawable/ic_search_category_default" />
+
+    <EditText
+        android:id="@+id/champion_list_search_field"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/champion_list_search_icon"
+        android:ems="10" >
+    </EditText>
+
+</RelativeLayout>
