@@ -11,7 +11,7 @@ public class DatabaseMain extends DatabaseHelper {
 		super(context, "gameStats_en_US.sqlite");
 	}
 
-	public String[] getAllChampions() throws SQLiteException {
+	public String[] getAllChampionsNames() throws SQLiteException {
 		Cursor cur;
 		String[] result = null;
 
@@ -29,6 +29,32 @@ public class DatabaseMain extends DatabaseHelper {
 		if (cur.moveToFirst()) {
 			for (int i = 0; i < result.length; i += 1) {
 				result[i] = cur.getString(0);
+				cur.moveToNext();
+			}
+		}
+		database.close();
+
+		return result;
+	}
+
+	public String[][] getAllChampionsNamesWithIds() throws SQLiteException {
+		String[][] result = null;
+
+		SQLiteDatabase database = getReadableDatabase();
+
+		// run the query
+		Cursor cur = database.rawQuery(
+				"SELECT id,displayName FROM champions ORDER BY displayName ASC",
+				null);
+
+		// initialize variable
+		result = new String[cur.getCount()][2];
+
+		// go through data and retrieve the name of drinks
+		if (cur.moveToFirst()) {
+			for (int i = 0; i < result.length; i += 1) {
+				result[i][0] = cur.getString(cur.getColumnIndex("id"));
+				result[i][1] = cur.getString(cur.getColumnIndex("displayName"));
 				cur.moveToNext();
 			}
 		}
@@ -62,9 +88,8 @@ public class DatabaseMain extends DatabaseHelper {
 		return result;
 	}
 
-	public String getChampionTitle(String champ) throws SQLiteException {
+	public String getChampionTitle(int id) throws SQLiteException {
 		String string = null;
-		int id = getChampionId(champ);
 
 		SQLiteDatabase database = getReadableDatabase();
 
@@ -80,7 +105,23 @@ public class DatabaseMain extends DatabaseHelper {
 
 		return string;
 	}
+	
+	public int getChampionName(int id) throws SQLiteException {
+		int result = 0;
 
+		SQLiteDatabase database = getReadableDatabase();
+		// run the query and get result
+		Cursor cur = database.rawQuery(
+				"SELECT id FROM champions WHERE id=?",
+				new String[] { Integer.toString(id) });
+		if (cur.moveToFirst()) {
+			result = cur.getInt(0);
+		}
+		database.close();
+
+		return result;
+	}
+	
 	public int getChampionId(String champ) throws SQLiteException {
 		int result = 0;
 
@@ -96,17 +137,10 @@ public class DatabaseMain extends DatabaseHelper {
 
 		return result;
 	}
-
-	public String removeSpecialChars(String name) {
-		return name.replace(".", "").replace(" ", "").replace("/", "")
-				.replace("'", "").replace(";", "").replace(":", "")
-				.replace("-", "").replace("!", "").replace(",", "");
-	}
-
-	public String[][] getAllSkillsByChampName(String champ)
+	
+	public String[][] getChampionAllSkills(int id)
 			throws SQLiteException {
 		String[][] result = null;
-		int id = getChampionId(champ);
 
 		SQLiteDatabase database = getReadableDatabase();
 
@@ -143,9 +177,8 @@ public class DatabaseMain extends DatabaseHelper {
 		return result;
 	}
 
-	public int getNumSkinsByChampName(String champ) throws SQLiteException {
+	public int getChampionNumSkins(int id) throws SQLiteException {
 		int result = 0;
-		int id = getChampionId(champ);
 
 		SQLiteDatabase database = getReadableDatabase();
 
@@ -154,9 +187,7 @@ public class DatabaseMain extends DatabaseHelper {
 				"SELECT COUNT(*) FROM championSkins WHERE championId=?",
 				new String[] { String.valueOf(id) });
 
-		// go through data and retrieve the name of drinks
 		if (cur.moveToFirst()) {
-			// initialize variable
 			result = cur.getInt(0);
 		}
 		database.close();
@@ -164,9 +195,8 @@ public class DatabaseMain extends DatabaseHelper {
 		return result;
 	}
 
-	public String[] getChampionCounters(String champion) {
+	public String[] getChampionCounters(int id) {
 		String[] string = null;
-		int id = getChampionId(champion);
 
 		SQLiteDatabase database = getReadableDatabase();
 
@@ -183,17 +213,15 @@ public class DatabaseMain extends DatabaseHelper {
 		return string;
 	}
 
-	public String getSkinName(String champ, int rank) {
+	public String getSkinName(int id, int rank) {
 		String skinName = null;
-
-		champ = removeSpecialChars(champ).replace(" ", "");
 
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query and get result
 		Cursor cur = database.rawQuery(
-				"SELECT displayName FROM championSkins WHERE portraitPath=?",
-				new String[] { champ + "_" + rank + ".jpg" });
+				"SELECT displayName FROM championSkins WHERE (championId=? AND rank=?) ",
+				new String[] {Integer.toString(id), Integer.toString(rank)});
 		if (cur.moveToFirst()) {
 			skinName = cur.getString(0);
 		}
@@ -203,9 +231,8 @@ public class DatabaseMain extends DatabaseHelper {
 		return skinName;
 	}
 
-	public String[] getChampionCounteredBy(String champion) {
+	public String[] getChampionCounteredBy(int id) {
 		String[] string = null;
-		int id = getChampionId(champion);
 
 		SQLiteDatabase database = getReadableDatabase();
 
@@ -223,15 +250,13 @@ public class DatabaseMain extends DatabaseHelper {
 		return string;
 	}
 
-	public String getChampionAttributes(String champion) throws SQLiteException {
-		Cursor cur;
+	public String getChampionAttributes(int id) throws SQLiteException {
 		String result = "";
-		int id = getChampionId(champion);
 
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query
-		cur = database.rawQuery("SELECT tags FROM champions WHERE id=?",
+		Cursor cur = database.rawQuery("SELECT tags FROM champions WHERE id=?",
 				new String[] { String.valueOf(id) });
 
 		// go through data
@@ -243,9 +268,8 @@ public class DatabaseMain extends DatabaseHelper {
 		return result;
 	}
 
-	public String getChampionLore(String champion) {
+	public String getChampionLore(int id) {
 		String result = null;
-		int id = getChampionId(champion);
 
 		SQLiteDatabase database = getReadableDatabase();
 
@@ -264,9 +288,8 @@ public class DatabaseMain extends DatabaseHelper {
 		return result;
 	}
 
-	public String[][] getChampionStats(String champion) {
+	public String[][] getChampionStats(int id) {
 		String result[][] = new String[9][2];
-		int id = getChampionId(champion);
 
 		SQLiteDatabase database = getReadableDatabase();
 
