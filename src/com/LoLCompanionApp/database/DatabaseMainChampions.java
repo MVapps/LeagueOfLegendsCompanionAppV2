@@ -10,7 +10,7 @@ public class DatabaseMainChampions extends DatabaseMain {
 	public DatabaseMainChampions(Context context) {
 		super(context);
 	}
-	
+
 	public String[] getAllChampionsNames() throws SQLiteException {
 		Cursor cur;
 		String[] result = null;
@@ -43,9 +43,10 @@ public class DatabaseMainChampions extends DatabaseMain {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query
-		Cursor cur = database.rawQuery(
-				"SELECT id,displayName FROM champions ORDER BY displayName ASC",
-				null);
+		Cursor cur = database
+				.rawQuery(
+						"SELECT id,displayName FROM champions ORDER BY displayName ASC",
+						null);
 
 		// initialize variable
 		result = new String[cur.getCount()][2];
@@ -105,14 +106,13 @@ public class DatabaseMainChampions extends DatabaseMain {
 
 		return string;
 	}
-	
+
 	public int getChampionName(int id) throws SQLiteException {
 		int result = 0;
 
 		SQLiteDatabase database = getReadableDatabase();
 		// run the query and get result
-		Cursor cur = database.rawQuery(
-				"SELECT id FROM champions WHERE id=?",
+		Cursor cur = database.rawQuery("SELECT id FROM champions WHERE id=?",
 				new String[] { Integer.toString(id) });
 		if (cur.moveToFirst()) {
 			result = cur.getInt(0);
@@ -121,7 +121,23 @@ public class DatabaseMainChampions extends DatabaseMain {
 
 		return result;
 	}
-	
+
+	public String getChampionIconPath(int id) throws SQLiteException {
+		String result = "";
+
+		SQLiteDatabase database = getReadableDatabase();
+		// run the query and get result
+		Cursor cur = database.rawQuery(
+				"SELECT iconPath FROM champions WHERE id=?",
+				new String[] { Integer.toString(id) });
+		if (cur.moveToFirst()) {
+			result = cur.getString(0);
+		}
+		database.close();
+
+		return result.toLowerCase();
+	}
+
 	public int getChampionId(String champ) throws SQLiteException {
 		int result = 0;
 
@@ -137,9 +153,8 @@ public class DatabaseMainChampions extends DatabaseMain {
 
 		return result;
 	}
-	
-	public String[][] getChampionAllSkills(int id)
-			throws SQLiteException {
+
+	public String[][] getChampionAllSkills(int id) throws SQLiteException {
 		String[][] result = null;
 
 		SQLiteDatabase database = getReadableDatabase();
@@ -195,6 +210,28 @@ public class DatabaseMainChampions extends DatabaseMain {
 		return result;
 	}
 
+	public String[] getChampionSkinsIconPaths(int id) throws SQLiteException {
+
+		SQLiteDatabase database = getReadableDatabase();
+
+		// run the query
+		Cursor cur = database.rawQuery(
+				"SELECT * FROM portraitPath WHERE championId=? ORDER BY rank ASC",
+				new String[] { String.valueOf(id) });
+		
+		String[] result = new String[cur.getCount()];
+		
+		if (cur.moveToFirst()) {
+			for (int i = 0; i < result.length; i += 1) {
+				result[i] = cur.getString(0).toLowerCase();
+				cur.moveToNext();
+			}
+		}
+		database.close();
+
+		return result;
+	}
+
 	public String[] getChampionCounters(int id) {
 		String[] string = null;
 
@@ -219,9 +256,11 @@ public class DatabaseMainChampions extends DatabaseMain {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query and get result
-		Cursor cur = database.rawQuery(
-				"SELECT displayName FROM championSkins WHERE (championId=? AND rank=?) ",
-				new String[] {Integer.toString(id), Integer.toString(rank)});
+		Cursor cur = database
+				.rawQuery(
+						"SELECT displayName FROM championSkins WHERE (championId=? AND rank=?) ",
+						new String[] { Integer.toString(id),
+								Integer.toString(rank) });
 		if (cur.moveToFirst()) {
 			skinName = cur.getString(0);
 		}
@@ -243,7 +282,6 @@ public class DatabaseMainChampions extends DatabaseMain {
 		if (cur.moveToFirst() && cur.getString(0) != null) {
 			string = cur.getString(0).split(",");
 		}
-		;
 
 		database.close();
 
