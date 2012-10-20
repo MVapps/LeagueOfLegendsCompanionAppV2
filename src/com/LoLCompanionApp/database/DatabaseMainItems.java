@@ -245,7 +245,7 @@ public class DatabaseMainItems extends DatabaseMain {
 		}
 		database.close();
 
-		return result.toLowerCase().toLowerCase();
+		return "img_" + result.toLowerCase().toLowerCase();
 	}
 
 	public String[] getItemStats(int id) throws SQLiteException {
