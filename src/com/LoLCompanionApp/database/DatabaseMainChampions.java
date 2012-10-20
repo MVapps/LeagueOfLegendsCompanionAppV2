@@ -135,7 +135,7 @@ public class DatabaseMainChampions extends DatabaseMain {
 		}
 		database.close();
 
-		return "img_" + result.toLowerCase();
+		return fixIconPathName(result);
 	}
 
 	public int getChampionId(String champ) throws SQLiteException {
@@ -223,7 +223,7 @@ public class DatabaseMainChampions extends DatabaseMain {
 		
 		if (cur.moveToFirst()) {
 			for (int i = 0; i < result.length; i += 1) {
-				result[i] = "img_" + cur.getString(0).toLowerCase();
+				result[i] = fixIconPathName(cur.getString(0));
 				cur.moveToNext();
 			}
 		}

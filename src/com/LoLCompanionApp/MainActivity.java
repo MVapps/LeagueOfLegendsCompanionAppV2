@@ -1,8 +1,6 @@
 package com.LoLCompanionApp;
 
-import com.LoLCompanionApp.util.Constant;
 import com.LoLCompanionApp.view.MainActivityView;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
