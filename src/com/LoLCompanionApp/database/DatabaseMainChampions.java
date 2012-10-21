@@ -18,9 +18,7 @@ public class DatabaseMainChampions extends DatabaseMain {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query
-		cur = database.rawQuery(
-				"SELECT displayName FROM champions ORDER BY displayName ASC",
-				null);
+		cur = database.rawQuery("SELECT displayName FROM champions ORDER BY displayName ASC", null);
 
 		// initialize variable
 		result = new String[cur.getCount()];
@@ -43,10 +41,8 @@ public class DatabaseMainChampions extends DatabaseMain {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query
-		Cursor cur = database
-				.rawQuery(
-						"SELECT id,displayName FROM champions ORDER BY displayName ASC",
-						null);
+		Cursor cur = database.rawQuery(
+				"SELECT id,displayName FROM champions ORDER BY displayName ASC", null);
 
 		// initialize variable
 		result = new String[cur.getCount()][2];
@@ -71,8 +67,7 @@ public class DatabaseMainChampions extends DatabaseMain {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query
-		cur = database.rawQuery(
-				"SELECT title FROM champions ORDER BY displayName ASC", null);
+		cur = database.rawQuery("SELECT title FROM champions ORDER BY displayName ASC", null);
 
 		// initialize variable
 		result = new String[cur.getCount()];
@@ -95,8 +90,7 @@ public class DatabaseMainChampions extends DatabaseMain {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query and get result
-		Cursor cur = database.rawQuery(
-				"SELECT title FROM champions WHERE id=?",
+		Cursor cur = database.rawQuery("SELECT title FROM champions WHERE id=?",
 				new String[] { String.valueOf(id) });
 		if (cur.moveToFirst()) {
 			string = cur.getString(0);
@@ -127,8 +121,7 @@ public class DatabaseMainChampions extends DatabaseMain {
 
 		SQLiteDatabase database = getReadableDatabase();
 		// run the query and get result
-		Cursor cur = database.rawQuery(
-				"SELECT iconPath FROM champions WHERE id=?",
+		Cursor cur = database.rawQuery("SELECT iconPath FROM champions WHERE id=?",
 				new String[] { Integer.toString(id) });
 		if (cur.moveToFirst()) {
 			result = cur.getString(0);
@@ -143,8 +136,7 @@ public class DatabaseMainChampions extends DatabaseMain {
 
 		SQLiteDatabase database = getReadableDatabase();
 		// run the query and get result
-		Cursor cur = database.rawQuery(
-				"SELECT id FROM champions WHERE displayName=?",
+		Cursor cur = database.rawQuery("SELECT id FROM champions WHERE displayName=?",
 				new String[] { champ });
 		if (cur.moveToFirst()) {
 			result = cur.getInt(0);
@@ -160,8 +152,7 @@ public class DatabaseMainChampions extends DatabaseMain {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query and get result
-		Cursor cur = database.rawQuery(
-				"SELECT * FROM championAbilities WHERE championId=?",
+		Cursor cur = database.rawQuery("SELECT * FROM championAbilities WHERE championId=?",
 				new String[] { String.valueOf(id) });
 
 		// go to first row
@@ -174,14 +165,12 @@ public class DatabaseMainChampions extends DatabaseMain {
 				// if the effect column is empty add the text from the
 				// description
 				if (result[i][1].equals("null")) {
-					result[i][1] = cur.getString(cur
-							.getColumnIndex("description"));
+					result[i][1] = cur.getString(cur.getColumnIndex("description"));
 				}
 				result[i][2] = "" + cur.getString(cur.getColumnIndex("hotkey"));
 				result[i][3] = "" + cur.getString(cur.getColumnIndex("cost"));
 				result[i][4] = "" + cur.getString(cur.getColumnIndex("range"));
-				result[i][5] = ""
-						+ cur.getString(cur.getColumnIndex("cooldown"));
+				result[i][5] = "" + cur.getString(cur.getColumnIndex("cooldown"));
 				// move to next row
 				cur.moveToNext();
 			}
@@ -198,8 +187,7 @@ public class DatabaseMainChampions extends DatabaseMain {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query
-		Cursor cur = database.rawQuery(
-				"SELECT COUNT(*) FROM championSkins WHERE championId=?",
+		Cursor cur = database.rawQuery("SELECT COUNT(*) FROM championSkins WHERE championId=?",
 				new String[] { String.valueOf(id) });
 
 		if (cur.moveToFirst()) {
@@ -218,9 +206,9 @@ public class DatabaseMainChampions extends DatabaseMain {
 		Cursor cur = database.rawQuery(
 				"SELECT * FROM portraitPath WHERE championId=? ORDER BY rank ASC",
 				new String[] { String.valueOf(id) });
-		
+
 		String[] result = new String[cur.getCount()];
-		
+
 		if (cur.moveToFirst()) {
 			for (int i = 0; i < result.length; i += 1) {
 				result[i] = fixIconPathName(cur.getString(0));
@@ -238,8 +226,7 @@ public class DatabaseMainChampions extends DatabaseMain {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query and get result
-		Cursor cur = database.rawQuery(
-				"SELECT counters FROM champions WHERE id=?",
+		Cursor cur = database.rawQuery("SELECT counters FROM champions WHERE id=?",
 				new String[] { String.valueOf(id) });
 		if (cur.moveToFirst()) {
 			string = cur.getString(0).split(",");
@@ -256,11 +243,9 @@ public class DatabaseMainChampions extends DatabaseMain {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query and get result
-		Cursor cur = database
-				.rawQuery(
-						"SELECT displayName FROM championSkins WHERE (championId=? AND rank=?) ",
-						new String[] { Integer.toString(id),
-								Integer.toString(rank) });
+		Cursor cur = database.rawQuery(
+				"SELECT displayName FROM championSkins WHERE (championId=? AND rank=?) ",
+				new String[] { Integer.toString(id), Integer.toString(rank) });
 		if (cur.moveToFirst()) {
 			skinName = cur.getString(0);
 		}
@@ -276,8 +261,7 @@ public class DatabaseMainChampions extends DatabaseMain {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query and get result
-		Cursor cur = database.rawQuery(
-				"SELECT countered FROM champions WHERE id=?",
+		Cursor cur = database.rawQuery("SELECT countered FROM champions WHERE id=?",
 				new String[] { String.valueOf(id) });
 		if (cur.moveToFirst() && cur.getString(0) != null) {
 			string = cur.getString(0).split(",");
@@ -312,8 +296,7 @@ public class DatabaseMainChampions extends DatabaseMain {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query
-		Cursor cur = database.rawQuery(
-				"SELECT description FROM champions WHERE id=?",
+		Cursor cur = database.rawQuery("SELECT description FROM champions WHERE id=?",
 				new String[] { String.valueOf(id) });
 
 		// go through data
@@ -350,10 +333,8 @@ public class DatabaseMainChampions extends DatabaseMain {
 			result[2][1] = cur.getString(cur.getColumnIndex("armorBase"));
 			result[3][1] = cur.getString(cur.getColumnIndex("manaLevel"));
 			result[4][1] = cur.getString(cur.getColumnIndex("manaRegenLevel"));
-			result[5][1] = cur
-					.getString(cur.getColumnIndex("healthRegenLevel"));
-			result[6][1] = cur
-					.getString(cur.getColumnIndex("magicResistLevel"));
+			result[5][1] = cur.getString(cur.getColumnIndex("healthRegenLevel"));
+			result[6][1] = cur.getString(cur.getColumnIndex("magicResistLevel"));
 			result[7][1] = cur.getString(cur.getColumnIndex("healthLevel"));
 			result[8][1] = cur.getString(cur.getColumnIndex("attackLevel"));
 		}

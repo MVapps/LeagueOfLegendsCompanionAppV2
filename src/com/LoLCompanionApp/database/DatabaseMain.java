@@ -8,9 +8,8 @@ public class DatabaseMain extends DatabaseHelper {
 		super(context, "gameStats_en_US.sqlite");
 	}
 
-	public String fixIconPathName(String str)
-	{
+	public String fixIconPathName(String str) {
 		return "img_" + str.replace('-', '_').replace(' ', '_').toLowerCase();
 	}
-	
+
 }
