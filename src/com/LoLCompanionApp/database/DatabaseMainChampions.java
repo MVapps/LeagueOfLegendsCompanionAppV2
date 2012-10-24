@@ -1,5 +1,7 @@
 package com.LoLCompanionApp.database;
 
+import java.util.ArrayList;
+
 import com.LoLCompanionApp.includes.BaseObject;
 import com.LoLCompanionApp.includes.ChampionObject;
 import com.LoLCompanionApp.includes.SkillObject;
@@ -15,7 +17,7 @@ public class DatabaseMainChampions extends DatabaseMain {
 		super(context);
 	}
 
-	public BaseObject[] getQuickChampionList() throws SQLiteException {
+	public ArrayList<BaseObject> getQuickChampionList() throws SQLiteException {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query
@@ -25,16 +27,16 @@ public class DatabaseMainChampions extends DatabaseMain {
 						null);
 
 		// initialize variable
-		BaseObject[] result = new BaseObject[cur.getCount()];
+		ArrayList<BaseObject> result = new ArrayList<BaseObject>();
 
 		// go through data and retrieve the name of drinks
 		if (cur.moveToFirst()) {
-			for (int i = 0; i < result.length; i += 1) {
-				result[i] = new BaseObject(
+			for (int i = 0; i < cur.getCount(); i += 1) {
+				result.add(new BaseObject(
 						cur.getInt(cur.getColumnIndex("id")), cur.getString(cur
 								.getColumnIndex("displayName")),
 						fixIconPathName(cur.getString(cur
-								.getColumnIndex("iconPath"))), 0);
+								.getColumnIndex("iconPath"))), 0));
 				cur.moveToNext();
 			}
 		}
@@ -88,7 +90,7 @@ public class DatabaseMainChampions extends DatabaseMain {
 		return champion;
 	}
 
-	public SkillObject[] getChampionSkills(int id) {
+	public ArrayList<SkillObject> getChampionSkills(int id) {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query
@@ -96,11 +98,11 @@ public class DatabaseMainChampions extends DatabaseMain {
 				"SELECT * FROM championAbilities WHERE championId=?",
 				new String[] { String.valueOf(id) });
 
-		SkillObject[] skills = new SkillObject[cur.getCount()];
+		ArrayList<SkillObject> skills = new ArrayList<SkillObject>();
 
 		if (cur.moveToFirst()) {
 			for (int i = 0; i < cur.getCount(); i++) {
-				skills[i] = new SkillObject(cur.getInt(cur
+				skills.add(new SkillObject(cur.getInt(cur
 						.getColumnIndex("championId")), cur.getInt(cur
 						.getColumnIndex("rank")), cur.getString(cur
 						.getColumnIndex("name")), cur.getString(cur
@@ -111,7 +113,7 @@ public class DatabaseMainChampions extends DatabaseMain {
 								.getColumnIndex("range")), cur.getString(cur
 								.getColumnIndex("effect")), cur.getString(cur
 								.getColumnIndex("description")), cur.getString(
-								cur.getColumnIndex("hotKey")).charAt(0));
+								cur.getColumnIndex("hotKey")).charAt(0)));
 				cur.moveToNext();
 			}
 		}
@@ -120,7 +122,7 @@ public class DatabaseMainChampions extends DatabaseMain {
 		return skills;
 	}
 
-	public SkinObject[] getChampionSkins(int id) {
+	public ArrayList<SkinObject> getChampionSkins(int id) {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query
@@ -128,16 +130,16 @@ public class DatabaseMainChampions extends DatabaseMain {
 				"SELECT * FROM championSkins WHERE championId=?",
 				new String[] { String.valueOf(id) });
 
-		SkinObject[] skills = new SkinObject[cur.getCount()];
+		ArrayList<SkinObject> skills = new ArrayList<SkinObject>();
 
 		if (cur.moveToFirst()) {
 			for (int i = 0; i < cur.getCount(); i++) {
-				skills[i] = new SkinObject(cur.getInt(cur
+				skills.add(new SkinObject(cur.getInt(cur
 						.getColumnIndex("championId")), cur.getInt(cur
 						.getColumnIndex("rank")), cur.getString(cur
 						.getColumnIndex("displayName")),
 						fixIconPathName(cur.getString(cur
-								.getColumnIndex("portraitPath"))));
+								.getColumnIndex("portraitPath")))));
 				cur.moveToNext();
 			}
 		}
