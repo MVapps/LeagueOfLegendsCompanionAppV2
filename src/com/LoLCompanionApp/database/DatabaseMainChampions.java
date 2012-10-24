@@ -1,7 +1,6 @@
 package com.LoLCompanionApp.database;
 
 import java.util.ArrayList;
-
 import com.LoLCompanionApp.includes.BaseObject;
 import com.LoLCompanionApp.includes.ChampionObject;
 import com.LoLCompanionApp.includes.SkillObject;
@@ -32,13 +31,35 @@ public class DatabaseMainChampions extends DatabaseMain {
 		// go through data and retrieve the name of drinks
 		if (cur.moveToFirst()) {
 			for (int i = 0; i < cur.getCount(); i += 1) {
-				result.add(new BaseObject(
-						cur.getInt(cur.getColumnIndex("id")), cur.getString(cur
-								.getColumnIndex("displayName")),
+				result.add(new BaseObject(cur.getInt(cur.getColumnIndex("id")),
+						cur.getString(cur.getColumnIndex("displayName")),
 						fixIconPathName(cur.getString(cur
 								.getColumnIndex("iconPath"))), 0));
 				cur.moveToNext();
 			}
+		}
+		database.close();
+
+		return result;
+	}
+
+	public BaseObject getChampionBaseObject(int id) throws SQLiteException {
+		SQLiteDatabase database = getReadableDatabase();
+
+		// run the query
+		Cursor cur = database.rawQuery(
+				"SELECT id,displayName,iconPath FROM champions WHERE id=?",
+				new String[] { Integer.toString(id) });
+
+		// initialize variable
+		BaseObject result = null;
+
+		// go through data and retrieve the name of drinks
+		if (cur.moveToFirst()) {
+			result = new BaseObject(cur.getInt(cur.getColumnIndex("id")),
+					cur.getString(cur.getColumnIndex("displayName")),
+					fixIconPathName(cur.getString(cur
+							.getColumnIndex("iconPath"))), 0);
 		}
 		database.close();
 
@@ -58,7 +79,8 @@ public class DatabaseMainChampions extends DatabaseMain {
 			// initialize variable
 			champion = new ChampionObject(cur.getInt(cur.getColumnIndex("id")),
 					cur.getString(cur.getColumnIndex("displayName")),
-					fixIconPathName(cur.getString(cur.getColumnIndex("iconPath"))), 0, cur.getString(cur
+					fixIconPathName(cur.getString(cur
+							.getColumnIndex("iconPath"))), 0, cur.getString(cur
 							.getColumnIndex("title")), cur.getString(cur
 							.getColumnIndex("tags")), cur.getString(cur
 							.getColumnIndex("description")), cur.getInt(cur
@@ -107,13 +129,12 @@ public class DatabaseMainChampions extends DatabaseMain {
 						.getColumnIndex("rank")), cur.getString(cur
 						.getColumnIndex("name")), cur.getString(cur
 						.getColumnIndex("cost")), cur.getString(cur
-						.getColumnIndex("cooldown")),
-						fixIconPathName(cur.getString(cur
-								.getColumnIndex("iconPath"))), cur.getInt(cur
-								.getColumnIndex("range")), cur.getString(cur
-								.getColumnIndex("effect")), cur.getString(cur
-								.getColumnIndex("description")), cur.getString(
-								cur.getColumnIndex("hotKey")).charAt(0)));
+						.getColumnIndex("cooldown")), fixIconPathName(cur
+						.getString(cur.getColumnIndex("iconPath"))), cur
+						.getInt(cur.getColumnIndex("range")), cur.getString(cur
+						.getColumnIndex("effect")), cur.getString(cur
+						.getColumnIndex("description")), cur.getString(
+						cur.getColumnIndex("hotKey")).charAt(0)));
 				cur.moveToNext();
 			}
 		}
@@ -137,9 +158,8 @@ public class DatabaseMainChampions extends DatabaseMain {
 				skills.add(new SkinObject(cur.getInt(cur
 						.getColumnIndex("championId")), cur.getInt(cur
 						.getColumnIndex("rank")), cur.getString(cur
-						.getColumnIndex("displayName")),
-						fixIconPathName(cur.getString(cur
-								.getColumnIndex("portraitPath")))));
+						.getColumnIndex("displayName")), fixIconPathName(cur
+						.getString(cur.getColumnIndex("portraitPath")))));
 				cur.moveToNext();
 			}
 		}
