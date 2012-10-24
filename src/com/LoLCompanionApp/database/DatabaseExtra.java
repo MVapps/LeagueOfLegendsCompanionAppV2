@@ -5,6 +5,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+
+import com.LoLCompanionApp.includes.CounterObject;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -25,8 +28,8 @@ public class DatabaseExtra extends DatabaseHelper {
 		this.context = context;
 
 		// set backup variables
-		BACKUP_PATH = Environment.getExternalStorageDirectory().toString() + File.separator
-				+ "LoLCompanionAppBackup" + File.separator;
+		BACKUP_PATH = Environment.getExternalStorageDirectory().toString()
+				+ File.separator + "LoLCompanionAppBackup" + File.separator;
 		BACKUP_USER_FILE = "backup_" + USER_COUNTER_TABLE + ".txt";
 		BACKUP_DEFAULT_FILE = "backup_" + DEFAULT_COUNTER_TABLE + ".txt";
 	}
@@ -49,69 +52,69 @@ public class DatabaseExtra extends DatabaseHelper {
 		}
 	}
 
-	public BaseObject[] getCounteredByChampions(int id) {
+	public ArrayList<CounterObject> getCounteredByChampions(int id) {
 
 		return getCounterChampions(id, "champid", "counterid");
 	}
 
-	public BaseObject[] getCounteringChampions(int id) {
+	public ArrayList<CounterObject> getCounteringChampions(int id) {
 
 		return getCounterChampions(id, "counterid", "champid");
 	}
 
-	private BaseObject[] getCounterChampions(int id, String searchColumn, String champColumn) {
+	private ArrayList<CounterObject> getCounterChampions(int id,
+			String searchColumn, String champColumn) {
 		// get champions that counter the chosen champion
 		SQLiteDatabase database = getReadableDatabase();
 
 		// create cursor array to hold the two result sets (ne for default
 		// values and one for user values)
 		Cursor[] curArray = {
-				database.rawQuery("SELECT * FROM " + USER_COUNTER_TABLE + " WHERE " + searchColumn
-						+ "=\'" + champ + "\'", null),
-				database.rawQuery("SELECT * FROM " + DEFAULT_COUNTER_TABLE + " WHERE "
-						+ searchColumn + "=\'" + champ + "\' AND visible=\'true\'", null) };
+				database.rawQuery("SELECT * FROM ? WHERE ?=?",
+						new String[] { USER_COUNTER_TABLE, searchColumn,
+								Integer.toString(id) }),
+				database.rawQuery(
+						"SELECT * FROM ? WHERE ?=? AND visible='true'",
+						new String[] { DEFAULT_COUNTER_TABLE, searchColumn,
+								Integer.toString(id) }) };
 
-		// create a result array based on how many rows returned
-		result = new String[curArray[0].getCount() + curArray[1].getCount()][6];
-
-		// create a new result counter to keep track of number of results
-		int counter = 0;
+		ArrayList<CounterObject> results = new ArrayList<CounterObject>();
 
 		// go through array of cursors and put in values.
 		for (int j = 0; j < curArray.length; j += 1) {
 			// go through the data and fill the array
 			if (curArray[j].moveToFirst()) {
 				for (int i = 0; i < curArray[j].getCount(); i += 1) {
-					// get the values
-					result[counter][0] = ""
-							+ curArray[j].getString(curArray[j].getColumnIndex(champColumn));
-					result[counter][1] = ""
-							+ curArray[j].getString(curArray[j].getColumnIndex("description"));
-					result[counter][2] = ""
-							+ curArray[j].getString(curArray[j].getColumnIndex("role"));
-					result[counter][3] = ""
-							+ curArray[j].getString(curArray[j].getColumnIndex("tips"));
-					result[counter][4] = ""
-							+ curArray[j].getString(curArray[j].getColumnIndex("id"));
 
+					CounterObject.CounterType type;
 					// first pass is user table, second is default table.
 					if (j == 0) {
-						result[counter][5] = "user";
+						type = CounterObject.CounterType.user;
 					} else {
-						result[counter][5] = "default";
+						type = CounterObject.CounterType.original;
 					}
+
+					results.add(new CounterObject(
+							curArray[j].getInt(curArray[j]
+									.getColumnIndex(champColumn)),
+							curArray[j].getString(curArray[j]
+									.getColumnIndex("description")),
+							curArray[j].getString(curArray[j]
+									.getColumnIndex("role")),
+							curArray[j].getString(curArray[j]
+									.getColumnIndex("tips")),
+							curArray[j].getInt(curArray[j].getColumnIndex("id")),
+							type));
 
 					// move to next row
 					curArray[j].moveToNext();
-					// Increment the resultCounter
-					counter += 1;
 				}
 			}
 		}
 
 		database.close();
 
-		return result;
+		return results;
 	}
 
 	public void deleteAllUserCounters() throws SQLiteException {
@@ -160,7 +163,8 @@ public class DatabaseExtra extends DatabaseHelper {
 
 			try {
 				// update the database with new values. (make rows disappear)
-				database.update(DEFAULT_COUNTER_TABLE, values, "id=?", new String[] { id });
+				database.update(DEFAULT_COUNTER_TABLE, values, "id=?",
+						new String[] { id });
 				database.close();
 				return true;
 			} catch (SQLiteException e) {
@@ -181,7 +185,8 @@ public class DatabaseExtra extends DatabaseHelper {
 
 		try {
 			// update the database with new values. (make rows appear)
-			database.update(DEFAULT_COUNTER_TABLE, values, "id=?", new String[] { id });
+			database.update(DEFAULT_COUNTER_TABLE, values, "id=?",
+					new String[] { id });
 		} catch (SQLiteException e) {
 			e.printStackTrace();
 		}
@@ -189,8 +194,8 @@ public class DatabaseExtra extends DatabaseHelper {
 		database.close();
 	}
 
-	public void addNewCounter(String counter, String champ, String role, String tips,
-			String description) throws SQLiteException {
+	public void addNewCounter(String counter, String champ, String role,
+			String tips, String description) throws SQLiteException {
 		SQLiteDatabase database = getWritableDatabase();
 
 		ContentValues values = new ContentValues();
@@ -220,7 +225,8 @@ public class DatabaseExtra extends DatabaseHelper {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// get database cursors
-		Cursor curUser = database.rawQuery("SELECT * FROM ?", new String[] { USER_COUNTER_TABLE });
+		Cursor curUser = database.rawQuery("SELECT * FROM ?",
+				new String[] { USER_COUNTER_TABLE });
 
 		// write the user files
 		// write down the actual information written by the user into a file in
@@ -250,7 +256,8 @@ public class DatabaseExtra extends DatabaseHelper {
 
 				// populate string with data
 				for (int i = 1; i < dbColumns.length; i += 1) {
-					row += curUser.getString(curUser.getColumnIndex(dbColumns[i]));
+					row += curUser.getString(curUser
+							.getColumnIndex(dbColumns[i]));
 					// if not at last pass, add deliminer
 					if ((i + 1) < dbColumns.length) {
 						row += "|";
@@ -283,7 +290,8 @@ public class DatabaseExtra extends DatabaseHelper {
 
 		SQLiteDatabase database = getReadableDatabase();
 
-		Cursor curDefault = database.rawQuery("SELECT * FROM ? WHERE visible='false'",
+		Cursor curDefault = database.rawQuery(
+				"SELECT * FROM ? WHERE visible='false'",
 				new String[] { DEFAULT_COUNTER_TABLE });
 
 		// write the the default file.
@@ -318,7 +326,8 @@ public class DatabaseExtra extends DatabaseHelper {
 	public void importDefaultCounters() throws SQLiteException, IOException {
 		try {
 			File defaultFile = new File(BACKUP_PATH + BACKUP_DEFAULT_FILE);
-			BufferedReader buffreader = new BufferedReader(new FileReader(defaultFile));
+			BufferedReader buffreader = new BufferedReader(new FileReader(
+					defaultFile));
 
 			// read the data (all in one line because was appended)
 			String[] defaultIds = buffreader.readLine().split(",");
@@ -335,7 +344,8 @@ public class DatabaseExtra extends DatabaseHelper {
 	public void importUserCounters() throws IOException, SQLiteException {
 		try {
 			File userFile = new File(BACKUP_PATH + BACKUP_USER_FILE);
-			BufferedReader buffreader = new BufferedReader(new FileReader(userFile));
+			BufferedReader buffreader = new BufferedReader(new FileReader(
+					userFile));
 
 			// read first line (columns)
 			String line = buffreader.readLine();
@@ -366,7 +376,8 @@ public class DatabaseExtra extends DatabaseHelper {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query and get result
-		Cursor cur = database.rawQuery("SELECT creaturegroup FROM spawns WHERE creature=?",
+		Cursor cur = database.rawQuery(
+				"SELECT creaturegroup FROM spawns WHERE creature=?",
 				new String[] { creature });
 		if (cur.moveToFirst()) {
 			result = cur.getString(0);
@@ -383,7 +394,8 @@ public class DatabaseExtra extends DatabaseHelper {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query and get result
-		Cursor cur = database.rawQuery("SELECT initialspawn FROM spawns WHERE creature=?",
+		Cursor cur = database.rawQuery(
+				"SELECT initialspawn FROM spawns WHERE creature=?",
 				new String[] { creature });
 		if (cur.moveToFirst()) {
 			result = cur.getLong(0);
@@ -400,7 +412,8 @@ public class DatabaseExtra extends DatabaseHelper {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query and get result
-		Cursor cur = database.rawQuery("SELECT respawn FROM spawns WHERE creature=?",
+		Cursor cur = database.rawQuery(
+				"SELECT respawn FROM spawns WHERE creature=?",
 				new String[] { creature });
 		if (cur.moveToFirst()) {
 			result = cur.getLong(0);
@@ -425,7 +438,8 @@ public class DatabaseExtra extends DatabaseHelper {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query and get result
-		Cursor cur = database.rawQuery("SELECT value FROM settings WHERE setting=?",
+		Cursor cur = database.rawQuery(
+				"SELECT value FROM settings WHERE setting=?",
 				new String[] { type });
 		if (cur.moveToFirst()) {
 			result = cur.getString(0);
