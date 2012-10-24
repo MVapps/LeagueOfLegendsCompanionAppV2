@@ -1,5 +1,7 @@
 package com.LoLCompanionApp.database;
 
+import java.util.ArrayList;
+
 import com.LoLCompanionApp.includes.BaseObject;
 import com.LoLCompanionApp.includes.ItemObject;
 import com.LoLCompanionApp.includes.ItemRecipieObject;
@@ -14,7 +16,7 @@ public class DatabaseMainItems extends DatabaseMain {
 		super(context);
 	}
 
-	public BaseObject[] getQuickItemList() throws SQLiteException {
+	public ArrayList<BaseObject> getQuickItemList() throws SQLiteException {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query
@@ -23,17 +25,16 @@ public class DatabaseMainItems extends DatabaseMain {
 				null);
 
 		// initialize variable
-		BaseObject[] result = new BaseObject[cur.getCount()];
+		ArrayList<BaseObject> result = new ArrayList<BaseObject>();
 
 		// go through data
 		if (cur.moveToFirst()) {
-			for (int i = 0; i < result.length; i += 1) {
-				result[i] = new BaseObject(
-						cur.getInt(cur.getColumnIndex("id")), cur.getString(cur
-								.getColumnIndex("displayName")),
+			for (int i = 0; i < cur.getCount(); i += 1) {
+				result.add(new BaseObject(cur.getInt(cur.getColumnIndex("id")),
+						cur.getString(cur.getColumnIndex("displayName")),
 						fixIconPathName(cur.getString(cur
 								.getColumnIndex("iconPath"))), cur.getInt(cur
-								.getColumnIndex("price")));
+								.getColumnIndex("price"))));
 				cur.moveToNext();
 			}
 		}
@@ -42,7 +43,7 @@ public class DatabaseMainItems extends DatabaseMain {
 		return result;
 	}
 
-	private BaseObject getBaseItemObject(int id) throws SQLiteException {
+	public BaseObject getBaseItemObject(int id) throws SQLiteException {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query
@@ -67,7 +68,7 @@ public class DatabaseMainItems extends DatabaseMain {
 		return result;
 	}
 
-	public ItemObject[] getAllItemsInCategory(int categoryId)
+	public ArrayList<ItemObject> getAllItemsInCategory(int categoryId)
 			throws SQLiteException {
 
 		SQLiteDatabase database = getReadableDatabase();
@@ -91,7 +92,7 @@ public class DatabaseMainItems extends DatabaseMain {
 			}
 		}
 
-		ItemObject[] result = new ItemObject[idCount];
+		ArrayList<ItemObject> result = new ArrayList<ItemObject>();
 
 		if (itemIds != "") {
 
@@ -102,7 +103,7 @@ public class DatabaseMainItems extends DatabaseMain {
 
 			if (itemCur.moveToFirst()) {
 				for (int i = 0; i < idCount; i += 1) {
-					result[i] = new ItemObject(
+					result.add(new ItemObject(
 							itemCur.getInt(itemCur.getColumnIndex("id")),
 							itemCur.getString(itemCur.getColumnIndex("name")),
 							itemCur.getString(itemCur
@@ -165,7 +166,7 @@ public class DatabaseMainItems extends DatabaseMain {
 							itemCur.getInt(itemCur
 									.getColumnIndex("flatEXPBonus")), itemCur
 									.getInt(itemCur
-											.getColumnIndex("percentEXPBonus")));
+											.getColumnIndex("percentEXPBonus"))));
 					itemCur.moveToNext();
 				}
 			}
@@ -189,7 +190,7 @@ public class DatabaseMainItems extends DatabaseMain {
 		int idCount = idCur.getCount();
 		BaseObject[] requiredItems = null;
 		String itemIds = "";
-		
+
 		if (idCur.moveToFirst()) {
 			itemIds = "WHERE id=";
 			for (int i = 0; i < idCount; i += 1) {
@@ -202,7 +203,7 @@ public class DatabaseMainItems extends DatabaseMain {
 
 		if (itemIds != "") {
 			requiredItems = new BaseObject[idCount];
-			
+
 			// run the query
 			Cursor cur = database
 					.rawQuery(
@@ -278,7 +279,8 @@ public class DatabaseMainItems extends DatabaseMain {
 		return item;
 	}
 
-	public ItemRecipieObject[] getRecipiesContainingItem(int id) throws SQLiteException {
+	public ArrayList<ItemRecipieObject> getRecipiesContainingItem(int id)
+			throws SQLiteException {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query
@@ -297,10 +299,10 @@ public class DatabaseMainItems extends DatabaseMain {
 			}
 		}
 		database.close();
-		
-		ItemRecipieObject[] recipies = new ItemRecipieObject[buildsToItemIds.length];
+
+		ArrayList<ItemRecipieObject> recipies = new ArrayList<ItemRecipieObject>();
 		for (int i = 0; i < buildsToItemIds.length; i += 1) {
-			recipies[i] = getItemRecipie(buildsToItemIds[i]);
+			recipies.add(getItemRecipie(buildsToItemIds[i]));
 		}
 
 		return recipies;
