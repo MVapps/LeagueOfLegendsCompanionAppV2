@@ -1,11 +1,16 @@
 package com.LoLCompanionApp;
 
+<<<<<<< HEAD
+=======
 import com.LoLCompanionApp.view.MainActivityView;
+>>>>>>> 67fb5b9d95ba8c990e4d78911a27e04bff076dcf
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+
+import com.LoLCompanionApp.view.MainActivityView;
 
 public class MainActivity extends Activity implements OnClickListener {
 
