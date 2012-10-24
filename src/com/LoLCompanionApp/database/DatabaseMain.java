@@ -9,7 +9,10 @@ public class DatabaseMain extends DatabaseHelper {
 	}
 
 	public String fixIconPathName(String str) {
-		return "img_" + str.replace('-', '_').replace(' ', '_').toLowerCase();
+		// Split at .jpg part. Take only name.
+		String[] imageName = str.split(".");
+		// Format the name before returning
+		return "img_" + imageName[0].replace('-', '_').replace(' ', '_').toLowerCase();
 	}
 
 }
