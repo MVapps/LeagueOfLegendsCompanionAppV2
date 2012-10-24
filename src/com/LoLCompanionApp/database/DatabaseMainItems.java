@@ -3,8 +3,6 @@ package com.LoLCompanionApp.database;
 import com.LoLCompanionApp.includes.BaseObject;
 import com.LoLCompanionApp.includes.ItemObject;
 import com.LoLCompanionApp.includes.ItemRecipieObject;
-import com.LoLCompanionApp.includes.SkillObject;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -129,6 +127,8 @@ public class DatabaseMainItems extends DatabaseMain {
 							itemCur.getInt(itemCur
 									.getColumnIndex("percentMPRegenMod")),
 							itemCur.getInt(itemCur
+									.getColumnIndex("flatArmorMod")),
+							itemCur.getInt(itemCur
 									.getColumnIndex("percentArmorMod")),
 							itemCur.getInt(itemCur
 									.getColumnIndex("flatAttackDamageMod")),
@@ -186,11 +186,10 @@ public class DatabaseMainItems extends DatabaseMain {
 						new String[] { Integer.toString(id) });
 
 		// initialize variable
-		BaseObject[] requiredItems = new BaseObject[idCur.getCount()];
-
-		String itemIds = "";
 		int idCount = idCur.getCount();
-
+		BaseObject[] requiredItems = null;
+		String itemIds = "";
+		
 		if (idCur.moveToFirst()) {
 			itemIds = "WHERE id=";
 			for (int i = 0; i < idCount; i += 1) {
@@ -202,6 +201,8 @@ public class DatabaseMainItems extends DatabaseMain {
 		}
 
 		if (itemIds != "") {
+			requiredItems = new BaseObject[idCount];
+			
 			// run the query
 			Cursor cur = database
 					.rawQuery(
@@ -234,7 +235,7 @@ public class DatabaseMainItems extends DatabaseMain {
 		Cursor cur = database.rawQuery("SELECT * FROM items WHERE id=?",
 				new String[] { Integer.toString(id) });
 
-		ItemObject item;
+		ItemObject item = null;
 
 		if (cur.moveToFirst()) {
 			item = new ItemObject(cur.getInt(cur.getColumnIndex("id")),
@@ -271,13 +272,13 @@ public class DatabaseMainItems extends DatabaseMain {
 					cur.getInt(cur.getColumnIndex("flatEXPBonus")),
 					cur.getInt(cur.getColumnIndex("percentEXPBonus")));
 		}
-		
+
 		database.close();
 
 		return item;
 	}
 
-	public int[] getRecipiesContainingItem(int id) throws SQLiteException {
+	public ItemRecipieObject[] getRecipiesContainingItem(int id) throws SQLiteException {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query
@@ -287,17 +288,22 @@ public class DatabaseMainItems extends DatabaseMain {
 						new String[] { Integer.toString(id) });
 
 		// initialize variable
-		int[] result = new int[cur.getCount()];
+		int[] buildsToItemIds = new int[cur.getCount()];
 
 		if (cur.moveToFirst()) {
-			for (int i = 0; i < result.length; i += 1) {
-				result[i] = cur.getInt(0);
+			for (int i = 0; i < buildsToItemIds.length; i += 1) {
+				buildsToItemIds[i] = cur.getInt(0);
 				cur.moveToNext();
 			}
 		}
 		database.close();
+		
+		ItemRecipieObject[] recipies = new ItemRecipieObject[buildsToItemIds.length];
+		for (int i = 0; i < buildsToItemIds.length; i += 1) {
+			recipies[i] = getItemRecipie(buildsToItemIds[i]);
+		}
 
-		return result;
+		return recipies;
 	}
 
 }

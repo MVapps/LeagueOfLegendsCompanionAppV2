@@ -49,22 +49,18 @@ public class DatabaseExtra extends DatabaseHelper {
 		}
 	}
 
-	public String[][] getCounteredByChampions(String champ) {
+	public BaseObject[] getCounteredByChampions(int id) {
 
-		return getCounterChampions(champ, "champid", "counterid");
+		return getCounterChampions(id, "champid", "counterid");
 	}
 
-	public String[][] getCounteringChampions(String champ) {
+	public BaseObject[] getCounteringChampions(int id) {
 
-		return getCounterChampions(champ, "counterid", "champid");
+		return getCounterChampions(id, "counterid", "champid");
 	}
 
-	private String[][] getCounterChampions(String champ, String searchColumn, String champColumn) {
+	private BaseObject[] getCounterChampions(int id, String searchColumn, String champColumn) {
 		// get champions that counter the chosen champion
-
-		String[][] result = null;
-		champ = champ.replace("'", "''");
-
 		SQLiteDatabase database = getReadableDatabase();
 
 		// create cursor array to hold the two result sets (ne for default
