@@ -1,13 +1,12 @@
 package com.LoLCompanionApp;
 
-import com.LoLCompanionApp.util.Constant;
-import com.LoLCompanionApp.view.MainActivityView;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+
+import com.LoLCompanionApp.view.MainActivityView;
 
 public class MainActivity extends Activity implements OnClickListener {
 

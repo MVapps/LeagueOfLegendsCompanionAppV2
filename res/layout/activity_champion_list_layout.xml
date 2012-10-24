@@ -4,6 +4,33 @@
     android:layout_height="match_parent" >
 
     <!-- This layout is to pull the focus from the edittext -->
+
+    <LinearLayout
+        android:id="@+id/champion_list_search_layout"
+        android:layout_width="125dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true" >
+
+        <ImageView
+            android:id="@+id/champion_list_search_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_search_category_default" />
+
+        <EditText
+            android:id="@+id/champion_list_search_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/edit_text_holo_dark"
+            android:ems="10"
+            android:textColor="@android:color/white" >
+
+            <requestFocus />
+        </EditText>
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="0px"
         android:layout_height="0px"
@@ -22,26 +49,8 @@
         android:id="@+id/champion_list_listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/champion_list_search_icon"
+        android:layout_below="@+id/champion_list_search_layout"
         android:layout_centerHorizontal="true" >
     </ListView>
-
-    <ImageView
-        android:id="@+id/champion_list_search_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:src="@android:drawable/ic_search_category_default" />
-
-    <EditText
-        android:id="@+id/champion_list_search_field"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/champion_list_search_icon"
-        android:ems="10" >
-    </EditText>
 
 </RelativeLayout>

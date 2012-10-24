@@ -7,6 +7,7 @@ import com.LoLCompanionApp.view.ChampionListView;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 
 /**
  * @author V
@@ -14,13 +15,17 @@ import android.os.Bundle;
  */
 public class ChampionListActivity extends Activity {
 	
-	ChampionListView mChampionListView = new ChampionListView(this);
+	private ChampionListView mChampionListView = new ChampionListView(this);
+	
+	private LayoutInflater layoutInflater;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mChampionListView.initialize();
+		layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+		mChampionListView.initialize(layoutInflater);
+		
 	}
 	
 }
