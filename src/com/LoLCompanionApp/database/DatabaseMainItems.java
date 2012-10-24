@@ -1,5 +1,10 @@
 package com.LoLCompanionApp.database;
 
+import com.LoLCompanionApp.includes.BaseObject;
+import com.LoLCompanionApp.includes.ItemObject;
+import com.LoLCompanionApp.includes.ItemRecipieObject;
+import com.LoLCompanionApp.includes.SkillObject;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -11,145 +16,26 @@ public class DatabaseMainItems extends DatabaseMain {
 		super(context);
 	}
 
-	public String[] getAllItems() throws SQLiteException {
-		String[] result = null;
-
-		SQLiteDatabase database = getReadableDatabase();
-
-		// run the query
-		Cursor cur = database.rawQuery("SELECT name FROM items ORDER BY name ASC", null);
-
-		// initialize variable
-		result = new String[cur.getCount()];
-
-		if (cur.moveToFirst()) {
-			for (int i = 0; i < result.length; i += 1) {
-				result[i] = cur.getString(0);
-				cur.moveToNext();
-			}
-		}
-		database.close();
-
-		return result;
-	}
-
-	public String[][] getAllItemsWithId() throws SQLiteException {
-		String[][] result = null;
-
-		SQLiteDatabase database = getReadableDatabase();
-
-		// run the query
-		Cursor cur = database.rawQuery("SELECT id,name FROM items ORDER BY name ASC", null);
-
-		// initialize variable
-		result = new String[cur.getCount()][2];
-
-		if (cur.moveToFirst()) {
-			for (int i = 0; i < result.length; i += 1) {
-				result[i][0] = cur.getString(cur.getColumnIndex("id"));
-				result[i][1] = cur.getString(cur.getColumnIndex("displayName"));
-				cur.moveToNext();
-			}
-		}
-		database.close();
-
-		return result;
-	}
-
-	public String[] getAllItemsInCategory(int categoryId) throws SQLiteException {
-
-		SQLiteDatabase database = getReadableDatabase();
-
-		// run the query
-		Cursor idCur = database.rawQuery(
-				"SELECT itemId FROM itemItemCategories WHERE itemCategoryId=? ORDER BY name ASC",
-				new String[] { String.valueOf(categoryId) });
-
-		String itemIds = "";
-		int idCount = idCur.getCount();
-
-		if (idCur.moveToFirst()) {
-			itemIds = "WHERE id=";
-			for (int i = 0; i < idCount; i += 1) {
-				itemIds += idCur.getString(0);
-				idCur.moveToNext();
-				if (i != idCount - 1)
-					itemIds += ",";
-			}
-		}
-
-		String[] result = new String[idCount];
-
-		// run the query
-		Cursor itemCur = database.rawQuery("SELECT name FROM items ? ORDER BY price ASC",
-				new String[] { itemIds });
-
-		if (itemCur.moveToFirst()) {
-			for (int i = 0; i < idCount; i += 1) {
-				result[i] = itemCur.getString(0);
-				itemCur.moveToNext();
-			}
-		}
-
-		database.close();
-
-		return result;
-	}
-
-	public String[][] getAllItemsInCategoryWithId(int categoryId) throws SQLiteException {
-		SQLiteDatabase database = getReadableDatabase();
-
-		// run the query
-		Cursor idCur = database.rawQuery(
-				"SELECT itemId FROM itemItemCategories WHERE itemCategoryId=? ORDER BY name ASC",
-				new String[] { String.valueOf(categoryId) });
-
-		String itemIds = "";
-		int idCount = idCur.getCount();
-
-		if (idCur.moveToFirst()) {
-			itemIds = "WHERE id=";
-			for (int i = 0; i < idCount; i += 1) {
-				itemIds += idCur.getString(0);
-				idCur.moveToNext();
-				if (i != idCount - 1)
-					itemIds += ",";
-			}
-		}
-
-		String[][] result = new String[idCount][2];
-
-		// run the query
-		Cursor itemCur = database.rawQuery("SELECT name FROM items ? ORDER BY price ASC",
-				new String[] { itemIds });
-
-		if (itemCur.moveToFirst()) {
-			for (int i = 0; i < idCount; i += 1) {
-				result[i][0] = itemCur.getString(itemCur.getColumnIndex("id"));
-				result[i][1] = itemCur.getString(itemCur.getColumnIndex("name"));
-				itemCur.moveToNext();
-			}
-		}
-
-		database.close();
-
-		return result;
-	}
-
-	public int[] getItemRecipie(int id) throws SQLiteException {
+	public BaseObject[] getQuickItemList() throws SQLiteException {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query
 		Cursor cur = database.rawQuery(
-				"SELECT recipieItemId FROM itemRecipies WHERE buildsToItemId=?",
-				new String[] { Integer.toString(id) });
+				"SELECT id,name,iconPath,price FROM items ORDER BY price ASC",
+				null);
 
 		// initialize variable
-		int[] result = new int[cur.getCount()];
+		BaseObject[] result = new BaseObject[cur.getCount()];
 
+		// go through data
 		if (cur.moveToFirst()) {
 			for (int i = 0; i < result.length; i += 1) {
-				result[i] = cur.getInt(0);
+				result[i] = new BaseObject(
+						cur.getInt(cur.getColumnIndex("id")), cur.getString(cur
+								.getColumnIndex("displayName")),
+						fixIconPathName(cur.getString(cur
+								.getColumnIndex("iconPath"))), cur.getInt(cur
+								.getColumnIndex("price")));
 				cur.moveToNext();
 			}
 		}
@@ -158,149 +44,247 @@ public class DatabaseMainItems extends DatabaseMain {
 		return result;
 	}
 
-	public String getItemDescription(int id) throws SQLiteException {
-		SQLiteDatabase database = getReadableDatabase();
-
-		// run the query
-		Cursor cur = database.rawQuery("SELECT description FROM items WHERE id=?",
-				new String[] { Integer.toString(id) });
-
-		// initialize variable
-		String result = "";
-
-		if (cur.moveToFirst()) {
-			result = cur.getString(0);
-		}
-		database.close();
-
-		return result;
-	}
-
-	public String getItemName(int id) throws SQLiteException {
-		SQLiteDatabase database = getReadableDatabase();
-
-		// run the query
-		Cursor cur = database.rawQuery("SELECT name FROM items WHERE id=?",
-				new String[] { Integer.toString(id) });
-
-		// initialize variable
-		String result = "";
-
-		if (cur.moveToFirst()) {
-			result = cur.getString(0);
-		}
-		database.close();
-
-		return result;
-	}
-
-	public String getItemId(String name) throws SQLiteException {
+	private BaseObject getBaseItemObject(int id) throws SQLiteException {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query
 		Cursor cur = database
-				.rawQuery("SELECT name FROM items WHERE id='?'", new String[] { name });
+				.rawQuery(
+						"SELECT id,name,iconPath,price FROM items WHERE id=? ORDER BY price ASC",
+						new String[] { Integer.toString(id) });
 
 		// initialize variable
-		String result = "";
+		BaseObject result = null;
 
+		// go through data
 		if (cur.moveToFirst()) {
-			result = cur.getString(0);
+			result = new BaseObject(cur.getInt(cur.getColumnIndex("id")),
+					cur.getString(cur.getColumnIndex("displayName")),
+					fixIconPathName(cur.getString(cur
+							.getColumnIndex("iconPath"))), cur.getInt(cur
+							.getColumnIndex("price")));
 		}
 		database.close();
 
 		return result;
 	}
 
-	public int getItemPrice(int id) throws SQLiteException {
+	public ItemObject[] getAllItemsInCategory(int categoryId)
+			throws SQLiteException {
+
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query
-		Cursor cur = database.rawQuery("SELECT price FROM items WHERE id=?",
+		Cursor idCur = database
+				.rawQuery(
+						"SELECT itemId FROM itemItemCategories WHERE itemCategoryId=? ORDER BY price ASC",
+						new String[] { String.valueOf(categoryId) });
+
+		String itemIds = "";
+		int idCount = idCur.getCount();
+
+		if (idCur.moveToFirst()) {
+			itemIds = "WHERE id=";
+			for (int i = 0; i < idCount; i += 1) {
+				itemIds += idCur.getString(0);
+				idCur.moveToNext();
+				if (i != idCount - 1)
+					itemIds += ",";
+			}
+		}
+
+		ItemObject[] result = new ItemObject[idCount];
+
+		if (itemIds != "") {
+
+			// run the query
+			Cursor itemCur = database.rawQuery(
+					"SELECT name FROM items ? ORDER BY price ASC",
+					new String[] { itemIds });
+
+			if (itemCur.moveToFirst()) {
+				for (int i = 0; i < idCount; i += 1) {
+					result[i] = new ItemObject(
+							itemCur.getInt(itemCur.getColumnIndex("id")),
+							itemCur.getString(itemCur.getColumnIndex("name")),
+							itemCur.getString(itemCur
+									.getColumnIndex("iconPath")),
+							itemCur.getInt(itemCur.getColumnIndex("price")),
+							itemCur.getString(itemCur
+									.getColumnIndex("description")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("flatHPPoolMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("flatMPPoolMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("percentHPPoolMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("percentMPPoolMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("flatHPRegenMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("percentHPRegenMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("flatMPRegenMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("percentMPRegenMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("percentArmorMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("flatAttackDamageMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("percentAttackDamageMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("flatAbilityPowerMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("percentAbilityPowerMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("flatMovementSpeedMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("percentMovementSpeedMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("flatAttackSpeedMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("percentAttackSpeedMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("flatDodgeMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("percentDodgeMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("flatCritChanceMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("percentCritChanceMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("flatCritDamageMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("percentCritDamageMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("flatMagicResistMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("percentMagicResistMod")),
+							itemCur.getInt(itemCur
+									.getColumnIndex("flatEXPBonus")), itemCur
+									.getInt(itemCur
+											.getColumnIndex("percentEXPBonus")));
+					itemCur.moveToNext();
+				}
+			}
+		}
+
+		database.close();
+
+		return result;
+	}
+
+	public ItemRecipieObject getItemRecipie(int id) throws SQLiteException {
+		SQLiteDatabase database = getReadableDatabase();
+
+		// run the query
+		Cursor idCur = database
+				.rawQuery(
+						"SELECT recipieItemId FROM itemRecipies WHERE buildsToItemId=?",
+						new String[] { Integer.toString(id) });
+
+		// initialize variable
+		BaseObject[] requiredItems = new BaseObject[idCur.getCount()];
+
+		String itemIds = "";
+		int idCount = idCur.getCount();
+
+		if (idCur.moveToFirst()) {
+			itemIds = "WHERE id=";
+			for (int i = 0; i < idCount; i += 1) {
+				itemIds += idCur.getString(0);
+				idCur.moveToNext();
+				if (i != idCount - 1)
+					itemIds += ",";
+			}
+		}
+
+		if (itemIds != "") {
+			// run the query
+			Cursor cur = database
+					.rawQuery(
+							"SELECT id,name,iconPath,price FROM items ? ORDER BY price ASC",
+							new String[] { itemIds });
+
+			// go through data
+			if (cur.moveToFirst()) {
+				for (int i = 0; i < requiredItems.length; i += 1) {
+					requiredItems[i] = new BaseObject(cur.getInt(cur
+							.getColumnIndex("id")), cur.getString(cur
+							.getColumnIndex("displayName")),
+							fixIconPathName(cur.getString(cur
+									.getColumnIndex("iconPath"))),
+							cur.getInt(cur.getColumnIndex("price")));
+					cur.moveToNext();
+				}
+			}
+		}
+
+		database.close();
+
+		return new ItemRecipieObject(getBaseItemObject(id), requiredItems);
+	}
+
+	public ItemObject getItemStats(int id) throws SQLiteException {
+		SQLiteDatabase database = getReadableDatabase();
+
+		// run the query
+		Cursor cur = database.rawQuery("SELECT * FROM items WHERE id=?",
 				new String[] { Integer.toString(id) });
 
-		// initialize variable
-		int result = 0;
+		ItemObject item;
 
 		if (cur.moveToFirst()) {
-			result = cur.getInt(0);
+			item = new ItemObject(cur.getInt(cur.getColumnIndex("id")),
+					cur.getString(cur.getColumnIndex("name")),
+					cur.getString(cur.getColumnIndex("iconPath")),
+					cur.getInt(cur.getColumnIndex("price")), cur.getString(cur
+							.getColumnIndex("description")), cur.getInt(cur
+							.getColumnIndex("flatHPPoolMod")), cur.getInt(cur
+							.getColumnIndex("flatMPPoolMod")), cur.getInt(cur
+							.getColumnIndex("percentHPPoolMod")),
+					cur.getInt(cur.getColumnIndex("percentMPPoolMod")),
+					cur.getInt(cur.getColumnIndex("flatHPRegenMod")),
+					cur.getInt(cur.getColumnIndex("percentHPRegenMod")),
+					cur.getInt(cur.getColumnIndex("flatMPRegenMod")),
+					cur.getInt(cur.getColumnIndex("percentMPRegenMod")),
+					cur.getInt(cur.getColumnIndex("flatArmorMod")),
+					cur.getInt(cur.getColumnIndex("percentArmorMod")),
+					cur.getInt(cur.getColumnIndex("flatAttackDamageMod")),
+					cur.getInt(cur.getColumnIndex("percentAttackDamageMod")),
+					cur.getInt(cur.getColumnIndex("flatAbilityPowerMod")),
+					cur.getInt(cur.getColumnIndex("percentAbilityPowerMod")),
+					cur.getInt(cur.getColumnIndex("flatMovementSpeedMod")),
+					cur.getInt(cur.getColumnIndex("percentMovementSpeedMod")),
+					cur.getInt(cur.getColumnIndex("flatAttackSpeedMod")),
+					cur.getInt(cur.getColumnIndex("percentAttackSpeedMod")),
+					cur.getInt(cur.getColumnIndex("flatDodgeMod")),
+					cur.getInt(cur.getColumnIndex("percentDodgeMod")),
+					cur.getInt(cur.getColumnIndex("flatCritChanceMod")),
+					cur.getInt(cur.getColumnIndex("percentCritChanceMod")),
+					cur.getInt(cur.getColumnIndex("flatCritDamageMod")),
+					cur.getInt(cur.getColumnIndex("percentCritDamageMod")),
+					cur.getInt(cur.getColumnIndex("flatMagicResistMod")),
+					cur.getInt(cur.getColumnIndex("percentMagicResistMod")),
+					cur.getInt(cur.getColumnIndex("flatEXPBonus")),
+					cur.getInt(cur.getColumnIndex("percentEXPBonus")));
 		}
+		
 		database.close();
 
-		return result;
-	}
-
-	public String getItemIconPath(int id) throws SQLiteException {
-		SQLiteDatabase database = getReadableDatabase();
-
-		// run the query
-		Cursor cur = database.rawQuery("SELECT iconPath FROM items WHERE id=?",
-				new String[] { Integer.toString(id) });
-
-		// initialize variable
-		String result = "";
-
-		if (cur.moveToFirst()) {
-			result = cur.getString(0);
-		}
-		database.close();
-
-		return fixIconPathName(result.toLowerCase());
-	}
-
-	public String[] getItemStats(int id) throws SQLiteException {
-		String result[] = new String[28];
-
-		SQLiteDatabase database = getReadableDatabase();
-
-		// run the query
-		Cursor cur = database.rawQuery("SELECT * FROM champions WHERE id=?",
-				new String[] { String.valueOf(id) });
-
-		// go through data and retrieve the name of drinks
-		if (cur.moveToFirst()) {
-			// initialize variable
-			result[0] = cur.getString(cur.getColumnIndex("flatHPPoolMod"));
-			result[1] = cur.getString(cur.getColumnIndex("flatMPPoolMod"));
-			result[2] = cur.getString(cur.getColumnIndex("percentHPPoolMod"));
-			result[3] = cur.getString(cur.getColumnIndex("percentMPPoolMod"));
-			result[4] = cur.getString(cur.getColumnIndex("flatHPRegenMod"));
-			result[5] = cur.getString(cur.getColumnIndex("percentHPRegenMod"));
-			result[6] = cur.getString(cur.getColumnIndex("flatMPRegenMod"));
-			result[7] = cur.getString(cur.getColumnIndex("percentMPRegenMod"));
-			result[8] = cur.getString(cur.getColumnIndex("flatArmorMod"));
-			result[9] = cur.getString(cur.getColumnIndex("percentArmorMod"));
-			result[10] = cur.getString(cur.getColumnIndex("flatAttackDamageMod"));
-			result[11] = cur.getString(cur.getColumnIndex("percentAttackDamageMod"));
-			result[12] = cur.getString(cur.getColumnIndex("flatAbilityPowerMod"));
-			result[13] = cur.getString(cur.getColumnIndex("percentAbilityPowerMod"));
-			result[14] = cur.getString(cur.getColumnIndex("flatMovementSpeedMod"));
-			result[15] = cur.getString(cur.getColumnIndex("percentMovementSpeedMod"));
-			result[16] = cur.getString(cur.getColumnIndex("flatAttackSpeedMod"));
-			result[17] = cur.getString(cur.getColumnIndex("percentAttackSpeedMod"));
-			result[18] = cur.getString(cur.getColumnIndex("flatDodgeMod"));
-			result[19] = cur.getString(cur.getColumnIndex("percentDodgeMod"));
-			result[20] = cur.getString(cur.getColumnIndex("flatCritChanceMod"));
-			result[21] = cur.getString(cur.getColumnIndex("percentCritChanceMod"));
-			result[22] = cur.getString(cur.getColumnIndex("flatCritDamageMod"));
-			result[23] = cur.getString(cur.getColumnIndex("percentCritDamageMod"));
-			result[24] = cur.getString(cur.getColumnIndex("flatMagicResistMod"));
-			result[25] = cur.getString(cur.getColumnIndex("percentMagicResistMod"));
-			result[26] = cur.getString(cur.getColumnIndex("flatEXPBonus"));
-			result[27] = cur.getString(cur.getColumnIndex("percentEXPBonus"));
-		}
-		database.close();
-
-		return result;
+		return item;
 	}
 
 	public int[] getRecipiesContainingItem(int id) throws SQLiteException {
 		SQLiteDatabase database = getReadableDatabase();
 
 		// run the query
-		Cursor cur = database.rawQuery(
-				"SELECT buildsToItemId FROM itemRecipies WHERE recipieItemId=?",
-				new String[] { Integer.toString(id) });
+		Cursor cur = database
+				.rawQuery(
+						"SELECT buildsToItemId FROM itemRecipies WHERE recipieItemId=?",
+						new String[] { Integer.toString(id) });
 
 		// initialize variable
 		int[] result = new int[cur.getCount()];
